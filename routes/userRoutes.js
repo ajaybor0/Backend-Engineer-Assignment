@@ -5,12 +5,14 @@ import {
   registerUser,
   logoutUser
 } from '../controllers/userController.js';
+import { runValidation } from '../validators/index.js';
+import { phoneNumberValidator } from '../validators/userValidator.js';
 import { protect } from '../middleware/authMiddleware.js';
 
 const router = express.Router();
 
-router.post('/', registerUser);
-router.post('/login', loginUser);
+router.post('/', phoneNumberValidator, runValidation, registerUser);
+router.post('/login', phoneNumberValidator, runValidation, loginUser);
 router.post('/logout', protect, logoutUser);
 
 export default router;
