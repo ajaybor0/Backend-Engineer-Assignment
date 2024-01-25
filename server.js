@@ -6,10 +6,12 @@ import { notFound, errorHandler } from './middleware/errorMiddleware.js';
 import userRoutes from './routes/userRoutes.js';
 import taskRoutes from './routes/taskRoutes.js';
 import subTaskRoutes from './routes/subTaskRoutes.js';
-
+import startCronJobs from './jobs/cronJobs.js';
 const port = process.env.PORT || 5000;
 // Connect to MongoDB
 connectDB();
+// Start cron jobs
+// startCronJobs(); //Remove comment to make call
 
 const app = express();
 
