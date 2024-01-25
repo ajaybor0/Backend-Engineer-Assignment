@@ -107,7 +107,7 @@ The project involves creating APIs for task management, including tasks, subtask
 
 - **Endpoint:** `PUT /api/v1/tasks/:id`
 - **Input:**
-  - `due_date` (date, optional)
+  - `dueDate` (date, optional)
   - `status` ("TODO" or "DONE", optional)
 - **Authorization:** JWT token required
 
@@ -140,7 +140,7 @@ The project involves creating APIs for task management, including tasks, subtask
   dueDate: Date,
   priority: Number,
   status: String,
-  subtasks: Array // Subtask schema
+  subtasks: Array, // Subtask schema
   createdAt: Date,
   updatedAt: Date,
   deletedAt: Date // Soft deletion field
