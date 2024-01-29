@@ -1,97 +1,201 @@
-# Task
+# Project Documentation
+This documentation provides an overview of the project structure, API endpoints, database models, and instructions for setting up and testing the project. The project is built using Node.js, Express.js, and MongoDB.
 
-You are required to create the following APIs:
+## Table of Contents
+1. [Project Overview](#project-overview)
+2. [Setup Instructions](#setup-instructions)
+3. [API Endpoints](#api-endpoints)
+4. [Database Models](#database-models)
+5. [Authentication](#authentication)
+6. [Error Handling](#error-handling)
+7. [Cron Jobs](#cron-jobs)
+8. [Testing](#testing)
+9. [Postman Collection](#postman-collection)
 
-1. **Create Task**
+## Project Overview
 
-   - Input: Title, Description, and Due Date with JWT Auth Token
+The project involves creating APIs for task management, including tasks, subtasks, and cron jobs for task priority and Twilio voice calling. It also emphasizes proper validation, error handling, and user authentication using JWT.
 
-2. **Create Subtask**
+## Setup Instructions
 
-   - Input: Task ID
+1. Fork the repository to your GitHub account.
+2. Clone the forked repository to your local machine
 
-3. **Get All User Tasks**
+   ```bash
+   git clone https://github.com/your-username/Backend-Engineer-Assignment.git
+   ```
 
-   - Filters: Priority, Due Date, Proper Pagination, etc.
+   ```bash
+   cd Backend-Engineer-Assignment
+   ```
 
-4. **Get All User Subtasks**
+3. Create a MongoDB database and obtain your MongoDB URI from [MongoDB Atlas](https://www.mongodb.com/cloud/atlas).
+4. Create a Twilio account and obtain your Account Sid,Auth Token & Phone Number from [Twilio](https://www.twilio.com/en-us).
 
-   - Filters: Task ID (if passed)
+5. Rename the `.env.example` file to `.env` and add the following environment variables:.
 
-5. **Update Task**
+   ```
+   NODE_ENV=development
+   PORT=5000
+   JWT_SECRET=YOUR_JWT_SECRET
+   MONGO_URI=YOUR_MONGO_URI
+   TWILIO_ACCOUNT_SID=YOUR_TWILIO_ACCOUNT_SID
+   TWILIO_AUTH_TOKEN=YOUR_TWILIO_AUTH_TOKEN
+   TWILIO_PHONE_NUMBER=YOUR_TWILIO_PHONE_NUMBER
+   ```
 
-   - Fields: Due Date, Status ("TODO" or "DONE")
+6. Install dependencies.
 
-6. **Update Subtask**
+   ```bash
+   npm install
+   ```
 
-   - Field: Status (0 or 1)
+7. Run the application.
 
-7. **Delete Task**
+   ```bash
+   npm start
+   ```
 
-   - Soft Deletion
+   or
 
-8. **Delete Subtask**
-   - Soft Deletion
+   ```bash
+   npm run dev
+   ```
+
+8. The application should now be running on `http://localhost:5000`.
+
+## API Endpoints
+
+### 1. Create Task
+
+- **Endpoint:** `POST /api/v1/tasks`
+- **Input:**
+  - `title` (string)
+  - `description` (string)
+  - `dueDate` (date)
+- **Authorization:** JWT token required
+
+### 2. Create Subtask
+
+- **Endpoint:** `POST /api/v1/sub-tasks/:id`
+- **Input:**
+  - `taskId` (Number)
+- **Authorization:** JWT token required
+
+### 3. Get All User Tasks
+
+- **Endpoint:** `GET /api/v1/tasks`
+- **Query Parameters:**
+  - `priority` (Number, optional)
+  - `dueDate` (date, optional)
+  - `page` (Number, optional)
+  - `limit` (Number, optional)
+- **Authorization:** JWT token required
+
+### 4. Get All User Subtasks
+
+- **Endpoint:** `GET /api/v1/sub-tasks/:id`
+- **Path Parameters:**
+  - `taskId` (Number)
+- **Query Parameters:**
+  - `taskId` (Number, optional)
+- **Authorization:** JWT token required
+
+### 5. Update Task
+
+- **Endpoint:** `PUT /api/v1/tasks/:id`
+- **Input:**
+  - `due_date` (date, optional)
+  - `status` ("TODO" or "DONE", optional)
+- **Authorization:** JWT token required
+
+### 6. Update Subtask
+
+- **Endpoint:** `PUT /api/v1/sub-tasks/:id`
+- **Input:**
+  - `status` (0 or 1)
+- **Authorization:** JWT token required
+
+### 7. Delete Task (Soft Deletion)
+
+- **Endpoint:** `PATCH /api/v1/tasks/:id`
+- **Authorization:** JWT token required
+
+### 8. Delete Subtask (Soft Deletion)
+
+- **Endpoint:** `PATCH /api/v1/sub-tasks/:id`
+- **Authorization:** JWT token required
+
+## Database Models
+
+### 1. Task Model
+
+```javascript
+{
+  _id: ObjectId, // Generate by MongoDB
+  title: String,
+  description: String,
+  dueDate: Date,
+  priority: Number,
+  status: String,
+  subtasks: Array // Subtask schema
+  createdAt: Date,
+  updatedAt: Date,
+  deletedAt: Date // Soft deletion field
+}
+```
+
+### 2. Subtask Model
+
+```javascript
+{
+  _id: ObjectId, // Generate by MongoDB
+  taskId: ObjectId, // Reference to Task Model
+  status: Number,
+  createdAt: Date,
+  updatedAt: Date,
+  deletedAt: Date
+}
+```
+
+### 3. User Model
+
+```javascript
+{
+  _id: ObjectId, // Generate by MongoDB
+  phoneNumber: Number,
+  priority: Number
+}
+```
+
+## Authentication
+
+JWT (JSON Web Token) is used for user authentication.
+
+## Error Handling
+
+Proper validation is implemented for input parameters. User-friendly error messages are returned for invalid requests. Additionally, common HTTP error status codes are used for different scenarios.
 
 ## Cron Jobs
 
-1. **Cron Logic for Changing Priority of Task**
+### 1. Change Priority based on Due Date
 
-   - Based on Due Date of Task
+- **Logic:** Priorities are assigned based on the due date of tasks.
+  - Priority 0: Due date is today.
+  - Priority 1: Due date is between tomorrow and the day after tomorrow.
+  - Priority 2: Due date is 3-4 days from today.
+  - Priority 3: Due date is 5 days or more from today.
 
-2. **Cron Logic for Voice Calling using Twilio**
-   - Triggered if a Task Passes its Due Date
-   - Calling Priority: 0 -> 1 -> 2 (Only if the previous user does not attend the call)
+### 2. Twilio Voice Calling
 
-## Instructions
+- **Logic:** Twilio voice calls are triggered if a task passes its due date. Calling priority is determined by the user's priority.
+  - Users with priority 0 are called first, followed by priority 1, and then priority 2.
+  - A user is called only if the previous user does not attend the call.
 
-- Proper validation is required for input and user authentication for API calls.
-- Implement error handling wherever necessary, and user-friendly errors should be thrown.
-- Use [jwt.io](https://jwt.io/) for creating a JWT token with `user_id`, and only corresponding decoding logic should be implemented.
-- Update corresponding subtasks in case of task updation and deletion.
-- Design the task model according to the given subtask model and user table.
-- Task should have priority and status (refer below for both).
-- Demonstrate all APIs using Postman.
+## Testing
 
-### Subtask Model
+Postman can be used to test all the APIs. Ensure that proper authentication tokens are included in the requests. Test cases should cover various scenarios, including valid and invalid inputs, error handling, and the proper functioning of cron jobs.
 
-- **id** (int, unique identifier)
-- **task_id** (int, references task table)
-- **status** (0 - incomplete, 1 - complete)
-- **created_at** (date/string)
-- **updated_at** (date/string)
-- **deleted_at** (date/string)
+## Postman Collection
 
-### User Model
-
-- **id** (int, unique identifier)
-- **phone_number** (num)
-- **priority** (0, 1, 2) - for Twilio calling priority
-
-### Priority for Task Model
-
-- 0 - Due date is today
-- 1 - Due date is between tomorrow and day after tomorrow
-- 2 - 3-4
-- 3 - 5+
-
-### Status for Task Model
-
-- "TODO" - when no subtask is finished
-- "IN_PROGRESS" - when at least 1 subtask is finished
-- "DONE" - when every subtask is completed
-
-## Assignment Submission Details
-
-When you're ready, please go ahead and start the assignment.
-
-- Use your own IDE to write the code.
-- Once done, upload the code on GitHub.
-- Use MongoDB to store the data.
-- Use Node.js and Express.js to create APIs.
-- Create a README file explaining your project.
-- Thoroughly test your project using Postman.
-
-This comprehensive task list ensures that the prospective intern can showcase their skills in frontend and backend development, database integration, security implementation, and documentation. The live changes during the interview assess their ability to adapt and make modifications in real-time, aligning with the dynamic nature of the development environment at TechnoVerse.
-
-**ALL THE BEST!**
+A Postman collection is provided in the repository (`Tasks Management.postman_collection.json`). Import this collection into Postman for easy testing of the APIs.
