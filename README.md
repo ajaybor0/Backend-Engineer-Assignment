@@ -23,8 +23,161 @@ You are required to create the following APIs:
 7. **Delete Task**
    - Soft Deletion
 
+<<<<<<< HEAD
 8. **Delete Subtask**
    - Soft Deletion
+=======
+   ```bash
+   cd Backend-Engineer-Assignment
+   ```
+
+3. Create a MongoDB database and obtain your MongoDB URI from [MongoDB Atlas](https://www.mongodb.com/cloud/atlas).
+4. Create a Twilio account and obtain your Account Sid,Auth Token & Phone Number from [Twilio](https://www.twilio.com/en-us).
+
+5. Rename the `.env.example` file to `.env` and add the following environment variables:.
+
+   ```
+   NODE_ENV=development
+   PORT=5000
+   JWT_SECRET=YOUR_JWT_SECRET
+   MONGO_URI=YOUR_MONGO_URI
+   TWILIO_ACCOUNT_SID=YOUR_TWILIO_ACCOUNT_SID
+   TWILIO_AUTH_TOKEN=YOUR_TWILIO_AUTH_TOKEN
+   TWILIO_PHONE_NUMBER=YOUR_TWILIO_PHONE_NUMBER
+   ```
+
+6. Install dependencies.
+
+   ```bash
+   npm install
+   ```
+
+7. Run the application.
+
+   ```bash
+   npm start
+   ```
+
+   or
+
+   ```bash
+   npm run dev
+   ```
+
+8. The application should now be running on `http://localhost:5000`.
+
+## API Endpoints
+
+### 1. Create Task
+
+- **Endpoint:** `POST /api/v1/tasks`
+- **Input:**
+  - `title` (string)
+  - `description` (string)
+  - `dueDate` (date)
+- **Authorization:** JWT token required
+
+### 2. Create Subtask
+
+- **Endpoint:** `POST /api/v1/sub-tasks/:id`
+- **Input:**
+  - `taskId` (Number)
+- **Authorization:** JWT token required
+
+### 3. Get All User Tasks
+
+- **Endpoint:** `GET /api/v1/tasks`
+- **Query Parameters:**
+  - `priority` (Number, optional)
+  - `dueDate` (date, optional)
+  - `page` (Number, optional)
+  - `limit` (Number, optional)
+- **Authorization:** JWT token required
+
+### 4. Get All User Subtasks
+
+- **Endpoint:** `GET /api/v1/sub-tasks/:id`
+- **Path Parameters:**
+  - `taskId` (Number)
+- **Query Parameters:**
+  - `taskId` (Number, optional)
+- **Authorization:** JWT token required
+
+### 5. Update Task
+
+- **Endpoint:** `PUT /api/v1/tasks/:id`
+- **Input:**
+  - `dueDate` (date, optional)
+  - `status` ("TODO" or "DONE", optional)
+- **Authorization:** JWT token required
+
+### 6. Update Subtask
+
+- **Endpoint:** `PUT /api/v1/sub-tasks/:id`
+- **Input:**
+  - `status` (0 or 1)
+- **Authorization:** JWT token required
+
+### 7. Delete Task (Soft Deletion)
+
+- **Endpoint:** `PATCH /api/v1/tasks/:id`
+- **Authorization:** JWT token required
+
+### 8. Delete Subtask (Soft Deletion)
+
+- **Endpoint:** `PATCH /api/v1/sub-tasks/:id`
+- **Authorization:** JWT token required
+
+## Database Models
+
+### 1. Task Model
+
+```javascript
+{
+  _id: ObjectId, // Generate by MongoDB
+  title: String,
+  description: String,
+  dueDate: Date,
+  priority: Number,
+  status: String,
+  subtasks: Array, // Subtask schema
+  createdAt: Date,
+  updatedAt: Date,
+  deletedAt: Date // Soft deletion field
+}
+```
+
+### 2. Subtask Model
+
+```javascript
+{
+  _id: ObjectId, // Generate by MongoDB
+  taskId: ObjectId, // Reference to Task Model
+  status: Number,
+  createdAt: Date,
+  updatedAt: Date,
+  deletedAt: Date
+}
+```
+
+### 3. User Model
+
+```javascript
+{
+  _id: ObjectId, // Generate by MongoDB
+  phoneNumber: Number,
+  priority: Number
+}
+```
+
+## Authentication
+
+JWT (JSON Web Token) is used for user authentication.
+
+## Error Handling
+
+Proper validation is implemented for input parameters. User-friendly error messages are returned for invalid requests. Additionally, common HTTP error status codes are used for different scenarios.
+>>>>>>> 1b2cae4ca944a9bf5c51b701896cd7450ac188af
 
 ## Cron Jobs
 
