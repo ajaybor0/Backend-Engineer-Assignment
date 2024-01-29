@@ -1,7 +1,3 @@
-Sure, here is the provided information converted into Markdown format:
-
----
-
 # Task
 
 You are required to create the following APIs:
